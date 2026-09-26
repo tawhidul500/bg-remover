@@ -1,0 +1,16 @@
+/* Cutout Studio – page styles.
+   Colours follow the Clipping World theme globals: primary #2E45A7, blue #1273EB,
+   accent #FF872A, light #F8F6FA. Typography is inherited from your theme. */
+.cs-wrap { max-width: 1440px; margin: 0 auto; padding: 0 12px 32px; }
+.cs-hero { background: linear-gradient(135deg, #2e45a7 0%, #1273eb 60%, #2984fe 100%); color: #fff; border-radius: 20px; padding: 36px 24px; margin: 8px 0 20px; text-align: center; }
+.cs-title { color: #fff; font-size: clamp(26px, 3.4vw, 42px); font-weight: 700; line-height: 1.2; margin: 0 0 10px; }
+.cs-sub { color: rgba(255, 255, 255, .92); max-width: 780px; margin: 0 auto; font-size: 16px; line-height: 1.6; }
+.cs-frame { position: relative; height: max(var(--cs-min-h, 760px), calc(100vh - 160px)); border: 1px solid #e5e7eb; border-radius: 16px; overflow: hidden; background: #f8f6fa; box-shadow: 0 10px 30px rgba(30, 41, 59, .08); }
+.cs-frame iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+.cs-note { margin-top: 10px; font-size: 13px; color: #334155; text-align: center; }
+.cs-note a { color: #ff872a; font-weight: 600; }
+@media (max-width: 767px) {
+  .cs-wrap { padding: 0 8px 24px; }
+  .cs-hero { padding: 22px 16px; border-radius: 14px; }
+  .cs-frame { height: max(560px, calc(100dvh - 120px)); border-radius: 12px; }
+}
