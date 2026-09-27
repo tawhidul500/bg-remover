@@ -56,6 +56,8 @@ export interface RenderOptions {
 
 export class Renderer {
   original: ImageBitmap | null = null;
+  /** Full-resolution transformed source for preview/original mode. AI uses the smaller working canvas. */
+  private originalWorking: HTMLCanvasElement | null = null;
   working: HTMLCanvasElement | null = null;
   private workingData: ImageData | null = null;
   mask: Uint8Array | null = null;
@@ -75,6 +77,14 @@ export class Renderer {
 
   setInput(t: InputTransform) {
     if (!this.original) return;
+    // Keep a full-resolution canvas for the original preview.
+    // The working canvas remains optimized for AI segmentation.
+    const fullScale = Math.max(1, this.original.width / t.width, this.original.height / t.height);
+    this.originalWorking = buildWorking(this.original, {
+      ...t,
+      width: Math.max(1, Math.round(t.width * fullScale)),
+      height: Math.max(1, Math.round(t.height * fullScale)),
+    });
     this.working = buildWorking(this.original, t);
     this.workingData = ctx2d(this.working).getImageData(0, 0, t.width, t.height);
     this.cutout = null; this.overlayC = null;
@@ -301,9 +311,13 @@ export class Renderer {
   /** Unedited working image placed with the same subject transform (aligned "Original" view). */
   renderOriginal(state: ProjectState, k: number): HTMLCanvasElement {
     const out = mkCanvas(state.canvas.width * k, state.canvas.height * k);
-    if (!this.working) return out;
+    const source = this.originalWorking ?? this.working;
+    if (!source) return out;
     const x = ctx2d(out);
-    this.subjectMatrix(x, state, k); x.drawImage(this.working, 0, 0);
+    // Original preview must use the full-resolution source, not the AI working image.
+    const oldW = this.ww, oldH = this.wh;
+    this.subjectMatrix(x, state, k);
+    x.drawImage(source, 0, 0, source.width, source.height, 0, 0, oldW, oldH);
     return out;
   }
 
