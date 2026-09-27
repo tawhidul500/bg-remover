@@ -115,7 +115,11 @@ export default function Viewport() {
   const boxW = cw * fit, boxH = ch * fit;
   const dpr = typeof window !== "undefined" ? Math.min(3, window.devicePixelRatio || 1) : 1;
   const bucket = Math.pow(2, Math.ceil(Math.log2(Math.max(1, zoom))));
-  const k = Math.min(1, fit * bucket * dpr, 3000 / Math.max(cw, ch));
+  // Render at a higher backing resolution while zooming. The old 3000px cap
+  // caused browser zoom to enlarge an already downsampled canvas, making the
+  // original preview blurry. Keep the performance limit only for extreme cases.
+  const maxPreviewSide = Math.max(3000, Math.min(10000, Math.max(cw, ch) * bucket));
+  const k = Math.min(1, fit * bucket * dpr, maxPreviewSide / Math.max(cw, ch));
 
   // Render preview (same pipeline as export, smaller k). rAF-coalesced.
   const raf = useRef(0);
